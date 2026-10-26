@@ -17,3 +17,8 @@ module lz4_top #(
     output logic [7:0] out_data,
     output logic out_last
 );
+
+
+endmodule
+
+`default_nettype wire

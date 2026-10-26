@@ -1,1 +1,1 @@
-lz4_top.sv
+rtl/lz4_top.sv
