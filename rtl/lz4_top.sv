@@ -2,7 +2,7 @@
 
 module lz4_top #(
     parameter int WINDOW_LB = 12,
-    parameter int HASH_LB = 12
+    parameter int HASH_BITS = 12
 ) (
     input logic clk,
     input logic rst_n,

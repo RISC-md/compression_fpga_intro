@@ -31,7 +31,7 @@ module ram #(
 
     `ifndef SYNTHESIS // SIM ONLY
         always_ff @(posedge clk) begin
-            if ((a_we || b_we) && a_addr == b_addr && (a_we != b_we || (a_we && b_we)))
+            if ((a_we || b_we) && a_addr == b_addr)
             $error("ram: cross-port same-address access at %h (a_we=%b b_we=%b)", a_addr, a_we, b_we);
         end
     `endif
