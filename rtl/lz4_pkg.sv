@@ -1,3 +1,5 @@
+/* verilator lint_off UNUSEDPARAM */
+
 package lz4_pkg;
 
     localparam int BLOCK_LB = 16;
@@ -12,3 +14,5 @@ package lz4_pkg;
     endfunction
 
 endpackage
+
+/* verilator lint_on UNUSEDPARAM */

@@ -7,7 +7,7 @@ module hash_table (
     input  logic [lz4_pkg::BLOCK_LB-1:0] current_pos, // location of data you want to hash in bram
     input  logic write_en, // store current position?
 
-    output logic [lz4_pkg::BLOCK_LB-1:0] previous_pos,
+    output logic [lz4_pkg::BLOCK_LB-1:0] previous_pos
 );
 
     import lz4_pkg::*;

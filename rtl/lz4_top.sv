@@ -1,3 +1,5 @@
+/* verilator lint_off UNUSEDPARAM */
+
 `default_nettype none
 
 module lz4_top #(
@@ -18,7 +20,15 @@ module lz4_top #(
     output logic out_last
 );
 
+    // TODO: the actual encoder lmao
+
+    assign in_ready = 1'b0;
+    assign out_valid = 1'b0;
+    assign out_data = '0;
+    assign out_last = 1'b0;
 
 endmodule
 
 `default_nettype wire
+
+/* verilator lint_on UNUSEDPARAM */

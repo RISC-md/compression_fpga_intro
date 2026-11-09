@@ -8,11 +8,11 @@ BIN = $(BUILD)/V$(TOP)
 TESTFILE ?= $(dir $(firstword $(TEST_SRCS)))example.txt
 
 VERILATOR ?= verilator
-VFLAGS := --cc --exe --build -j 0 -Wall --trace --assert --x-assign unique --x-initial unique --top-module $(TOP) -Irtl -Mdir $(BUILD)
+VFLAGS := --cc --exe --build -j 0 -Wall --trace --assert --x-assign unique --x-initial unique --top-module $(TOP) -Irtl -Mdir $(BUILD) --timescale 1ns/1ps
 CFLAGS := -std=c++17 -O2
 LDFLAGS := -llz4
 
-.PHONY: all test lint waves clean
+.PHONY: all test lint waves clean tb
 
 all: $(BIN)
 
@@ -30,3 +30,7 @@ waves: test
 
 clean:
 	rm -rf $(BUILD)
+
+tb:
+	$(VERILATOR) --binary -j 0 -Wall --timescale 1ns/1ps --trace --assert -Mdir $(BUILD)/$(TB) --top-module $(TB) -f $(RTL_LIST) tb/$(TB).sv 
+	./$(BUILD)/$(TB)/V$(TB)
