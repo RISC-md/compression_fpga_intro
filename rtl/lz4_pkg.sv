@@ -2,7 +2,7 @@
 
 package lz4_pkg;
 
-    localparam int BLOCK_LB = 16;
+    localparam int BLOCK_LB = 12;
     localparam int LEN_W = BLOCK_LB + 1;
     localparam int HASH_LB = 12;
     localparam int MIN_MATCH = 4;

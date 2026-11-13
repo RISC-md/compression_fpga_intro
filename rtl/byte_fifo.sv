@@ -1,23 +1,24 @@
 `default_nettype none
 
 module byte_fifo #(
-    parameter int DEPTH_LB = 10
+    parameter int DEPTH_LB = 10,
+    parameter int DATA_W = 8
 ) (
     input logic clk,
     input logic rst_n,
 
     input logic wr_valid,
     output logic wr_ready,
-    input logic [7:0] wr_data,
+    input logic [DATA_W-1:0] wr_data,
 
     output logic rd_valid,
     input logic rd_ready,
-    output logic [7:0] rd_data,
+    output logic [DATA_W-1:0] rd_data,
 
     output logic [DEPTH_LB:0] count // testing ONLY
 );
 
-    logic [7:0] mem [0:(1 << DEPTH_LB) - 1];
+    logic [DATA_W-1:0] mem [0:(1 << DEPTH_LB) - 1];
     logic [DEPTH_LB:0] wr_ptr, rd_ptr;
 
     wire empty = (wr_ptr == rd_ptr);
