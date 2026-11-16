@@ -103,7 +103,30 @@ module lz4_top #(
     assign out_data = ofx_rd_data[7:0];
     assign out_last = ofx_rd_data[8];
 
+    logic a_we;
+    logic [BLOCK_LB-1:0] a_addr, b_addr;
+    logic [7:0] a_wdata, a_rdata, b_rdata;
 
+    ram #(.DATA_W(8), .ADDR_W(BLOCK_LB)) blk (
+        .clk(clk),
+        .a_we(a_we),
+        .a_addr(a_addr),
+        .a_wdata(a_wdata),
+        .a_rdata(a_rdata),
+        .b_we(1'b0),
+        .b_addr(b_addr),
+        .b_wdata(8'h00),
+        .b_rdata(b_rdata)
+    );
+
+    logic [BLOCK_LB-1:0] ht_prev;
+    hash_table ht (
+        .clk(clk),
+        .data_in(win),
+        .current_pos(ip),
+        .write_en(state == S_SCAN0),
+        .previous_pos(ht_prev)
+    )
 
     // PLACEHOLDERS TO ENSURE COMPILATION !!
 
