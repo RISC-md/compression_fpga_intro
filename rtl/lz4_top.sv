@@ -32,7 +32,9 @@ module lz4_top #(
 
     state_t state;
     
-    // TODO: the actual encoder lmao
+    // Connect block loading, storage, sequence control, match finding, encoding,
+    // and output buffering, with reset conversion and hash-history reset per block.
+    // Release each block after its final output handshake; see IMPLEMENTATION_PLAN.md.
 
     assign in_ready = 1'b0;
     assign out_valid = 1'b0;
