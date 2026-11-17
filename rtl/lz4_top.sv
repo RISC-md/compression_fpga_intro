@@ -128,6 +128,88 @@ module lz4_top #(
         .previous_pos(ht_prev)
     )
 
+    wire [LEN_W-1:0] ip_ext = {1'b0, ip};
+    wire [LEN_W-1:0] j_ext = {1'b0, j};
+    wire [LEN_W-1:0] anchor_ext = {1'b0, anchor};
+    wire [LEN_W-1:0] k_ext = {1'b0, k};
+
+    wire need_flush = (ip_ext + LEN_W'(MF_LIMIT)) > n; // are we in last MF_LIMIT bytes?
+    wire [LEN_W-1:0] match_limit = n - LEN_W'(LAST_LITS); // stop at LAST_LITS
+    wire [LEN+W-1:0] final_lit = n - anchor_ext; // ct for final lits sequence
+
+    function automatic logic [7:0] make_token(
+        input logic [LEN_W-1:0] l,
+        input logic [LEN_W-1:0] m
+    );
+        logic [3:0] hi, lo;
+        hi = (l >= LEN_W'(15)) ? 4'd15 : l[3:0]; // RIPPED FROM LZ4 DOCUMENTATION PAPER
+        lo = (m >= LEN_W'(15)) ? 4'd15 : m[3:0]; // LZ4 TOKEN IS LITERAL COUNT, MATCH LENGTH CODE
+        return {hi, lo};
+    endfunction
+
+    wire state_t after_lits = final_seq ? S_DONE : S_EM_OFF0;
+
+    always_comb begin
+        a_we = 1'b0; a_addr = '0; a_wdata = '0; b_addr = '0;
+        case (state)
+            S_LOAD: begin
+                a_we = ifx_rd_valid;
+                a_addr = n[BLOCK_LB-1:0];
+                a_wdata = iq_data;
+            end
+            S_PRIME_ADDR, S_PRIME_CAP:
+                a_addr = ip + {{(BLOCK_LB-2){1'B0}}, pc}; // magic. zero extend pc
+            S_EM_LITS_ADDR, S_EM_LITS_PUSH:
+                a_addr = lit_base + j;
+            S_SCAN0, S_SCAN1:
+                a_addr = ip + BLOCK_LB'(4);
+            S_MATCH0, S_MATCH1: begin
+                a_addr = ip + k;
+                b_addr = cand + k;
+            end
+            default: ;
+        endcase
+    end
+
+    always_comb begin
+        push = 1'b0;
+        push_data = '0;
+        case (state)
+            S_EM_TOKEN: begin
+                push = 1'b1;
+                push_data = tok;
+            end
+            S_EM_LEN: begin
+                push = 1'b1;
+                push_data = (rem >= LEN_W'(255)) ? 8'd255 : rem[7:0];
+            end
+            S_EM_LITS_PUSH: begin
+                push = 1'b1; 
+                push_data = a_rdata;
+            end
+            S_EM_OFF0: begin
+                push = 1'b1;
+                push_data = off[7:0]; 
+            end
+            S_EM_OFF1: begin
+                push = 1'b1;
+                push_data = off[15:8];
+            end
+            default: ;
+        endcase
+    end
+
+    assign push_last = final_seq && (
+        (state == S_EM_TOKEN && lit == '0) ||
+        (state == S_EM_LITS_PUSH && (j_ext + LEN_W'(1)) == lit)
+    );
+
+    wire fire = push && ofx_wr_ready;
+    assign ifx_rd_ready = (state == S_LOAD) && (n < BLOCK_SZ);
+    wire iq_fire = ifx_rd_valid && ifx_rd_ready;
+
+    
+
     // PLACEHOLDERS TO ENSURE COMPILATION !!
 
     assign in_ready = 1'b0;
