@@ -39,19 +39,19 @@ module tb_hash_table;
         current_pos = '0;
         write_en    = 1'b0;
 
-        step(ABCD, 16'd0, 1'b0);
-        step(ABCD, 16'd0, 1'b1); // insert ABCD @0
+        step(ABCD, BLOCK_LB'(0), 1'b0);
+        step(ABCD, BLOCK_LB'(0), 1'b1); // insert ABCD @0
 
-        step(ABCD, 16'd0, 1'b0); // lookup ABCD
-        assert (previous_pos == 16'd0) // should get 0
+        step(ABCD, BLOCK_LB'(0), 1'b0); // lookup ABCD
+        assert (previous_pos == BLOCK_LB'(0)) // should get 0
             else $fatal(1, "lookup after insert: got %0d, expected 0", previous_pos);
 
-        step(ABCD, 16'd6, 1'b1); // insert ABCD @6
-        assert (previous_pos == 16'd0) // should still get 0 since that was before we inserted
+        step(ABCD, BLOCK_LB'(6), 1'b1); // insert ABCD @6
+        assert (previous_pos == BLOCK_LB'(0)) // should still get 0 since that was before we inserted
             else $fatal(1, "insert must return pre-write value: got %0d, expected 0", previous_pos);
 
-        step(ABCD, 16'd6, 1'b0); // read ABCD (lookup)
-        assert (previous_pos == 16'd6) // now get 6
+        step(ABCD, BLOCK_LB'(6), 1'b0); // read ABCD (lookup)
+        assert (previous_pos == BLOCK_LB'(6)) // now get 6
             else $fatal(1, "updated lookup: got %0d, expected 6", previous_pos);
 
         $display("tb_hash_table done.");
